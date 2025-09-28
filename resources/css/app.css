@@ -1,0 +1,60 @@
+﻿body {
+    scroll-behavior: smooth;
+}
+
+.panel {
+    display: none;
+}
+
+.panel.active {
+    display: block;
+}
+
+#category-list .card,
+#account-list .card,
+#card-list .card,
+#goal-list .card {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+#category-list .card-title,
+#account-list .card-title,
+#card-list .card-title,
+#goal-list .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+#goal-progress .progress {
+    height: 0.85rem;
+}
+
+#goal-progress .list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+#goal-progress .badge {
+    min-width: 4.5rem;
+}
+
+#recurrence-summary .list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.expense-kind-field.d-none {
+    display: none !important;
+}
+
+.expense-kind-field {
+    transition: opacity 0.2s ease;
+}
+
+#latest-transactions tbody tr td:last-child {
+    font-weight: 600;
+}

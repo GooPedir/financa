@@ -32,6 +32,7 @@ class TransactionController extends Controller
             'account_id' => 'required|exists:accounts,id',
             'member_id' => 'required|exists:members,id',
             'type' => 'required|in:INCOME,EXPENSE,TRANSFER,CARD_PURCHASE,CARD_PAYMENT',
+            'expense_kind' => 'nullable|in:FIXED,INSTALLMENT,ONE_TIME',
             'category_id' => 'nullable|exists:categories,id',
             'description' => 'required|string',
             'amount' => 'required|numeric',
@@ -43,11 +44,15 @@ class TransactionController extends Controller
             'splits.*.amount' => 'required_with:splits|numeric',
         ]);
 
+        if (!in_array($data['type'], ['EXPENSE', 'CARD_PURCHASE'], true)) {
+            $data['expense_kind'] = null;
+        }
+
         return DB::transaction(function () use ($data) {
-            $tx = Transaction::create([
-                ...collect($data)->except(['splits'])->toArray(),
-                'tenant_id' => TenantContext::id(),
-            ]);
+            $payload = collect($data)->except(['splits'])->toArray();
+            $payload['tenant_id'] = TenantContext::id();
+            $tx = Transaction::create($payload);
+
             if (!empty($data['splits'])) {
                 foreach ($data['splits'] as $s) {
                     TransactionSplit::create([
@@ -57,6 +62,7 @@ class TransactionController extends Controller
                     ]);
                 }
             }
+
             return response()->json($tx->load('splits'), 201);
         });
     }
@@ -69,7 +75,19 @@ class TransactionController extends Controller
     public function update(Request $request, $id)
     {
         $tx = Transaction::findOrFail($id);
-        $tx->fill($request->only(['description','amount','date','tags','notes','category_id']))->save();
+        $data = $request->validate([
+            'description' => 'sometimes|string',
+            'amount' => 'sometimes|numeric',
+            'date' => 'sometimes|date',
+            'tags' => 'sometimes|array',
+            'notes' => 'nullable|string',
+            'category_id' => 'nullable|exists:categories,id',
+            'expense_kind' => 'nullable|in:FIXED,INSTALLMENT,ONE_TIME',
+        ]);
+        if ($tx->type !== 'EXPENSE' && $tx->type !== 'CARD_PURCHASE') {
+            $data['expense_kind'] = null;
+        }
+        $tx->fill($data)->save();
         return response()->json($tx);
     }
 
@@ -80,4 +98,3 @@ class TransactionController extends Controller
         return response()->json(['deleted' => true]);
     }
 }
-

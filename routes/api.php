@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AccountController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CardController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\GoalController;
 use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\InvoiceController;
@@ -23,6 +24,8 @@ Route::prefix('auth')->middleware('throttle:20,1')->group(function () {
 });
 
 Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
+    Route::get('/dashboard/summary', [DashboardController::class, 'summary']);
+
     Route::get('/tenants/me', [TenantController::class, 'me']);
 
     Route::get('/members', [MemberController::class, 'index']);
@@ -46,6 +49,7 @@ Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
     Route::apiResource('transactions', TransactionController::class);
     Route::apiResource('recurrences', RecurrenceController::class);
     Route::apiResource('goals', GoalController::class);
+    Route::post('/goals/{goal}/contribute', [GoalController::class, 'contribute']);
     Route::get('/goals/{id}/progress', [GoalController::class, 'progress']);
 
     Route::get('/reports/cashflow', [ReportController::class, 'cashflow']);

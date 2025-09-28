@@ -50,7 +50,11 @@ class CardController extends Controller
             'amount' => 'required|numeric',
             'date' => 'required|date',
             'installments' => 'nullable|integer|min:1|max:60',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
+
+        $installments = (int)($data['installments'] ?? 1);
+        $kind = $installments > 1 ? 'INSTALLMENT' : 'ONE_TIME';
 
         $member = Member::where('tenant_id', TenantContext::id())
             ->where('user_id', $request->user()->id)
@@ -62,7 +66,9 @@ class CardController extends Controller
             $data['description'],
             (float)$data['amount'],
             Carbon::parse($data['date']),
-            (int)($data['installments'] ?? 1)
+            $installments,
+            $data['category_id'] ?? null,
+            $kind
         );
 
         return response()->json(['transaction' => $tx, 'purchases' => $purchases], 201);
@@ -76,4 +82,3 @@ class CardController extends Controller
         return response()->json($invoice);
     }
 }
-

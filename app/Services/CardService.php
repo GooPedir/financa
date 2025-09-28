@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Account;
 use App\Models\Card;
 use App\Models\CardPurchase;
 use App\Models\Invoice;
@@ -14,14 +13,24 @@ use Illuminate\Support\Facades\DB;
 
 class CardService
 {
-    public function purchase(Card $card, Member $member, string $description, float $amount, \DateTimeInterface $date, int $installments = 1): array
-    {
-        return DB::transaction(function () use ($card, $member, $description, $amount, $date, $installments) {
+    public function purchase(
+        Card $card,
+        Member $member,
+        string $description,
+        float $amount,
+        \DateTimeInterface $date,
+        int $installments = 1,
+        ?int $categoryId = null,
+        ?string $expenseKind = null
+    ): array {
+        return DB::transaction(function () use ($card, $member, $description, $amount, $date, $installments, $categoryId, $expenseKind) {
             $transaction = Transaction::create([
                 'tenant_id' => TenantContext::id(),
                 'account_id' => $card->account_id,
                 'member_id' => $member->id,
                 'type' => 'CARD_PURCHASE',
+                'expense_kind' => $expenseKind,
+                'category_id' => $categoryId,
                 'description' => $description,
                 'amount' => $amount,
                 'date' => Carbon::instance($date)->toDateString(),
@@ -83,4 +92,3 @@ class CardService
         return $invoice;
     }
 }
-

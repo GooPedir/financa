@@ -1,11 +1,7 @@
-<?php
+﻿<?php
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/register', function () {
-    return view('register');
-});
+Route::view('/', 'landing');
+Route::view('/app', 'dashboard');
+Route::view('/register', 'register');

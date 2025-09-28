@@ -11,7 +11,18 @@ class Transaction extends Model
     use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'tenant_id','account_id','member_id','type','category_id','description','amount','date','tags','notes','transfer_group_id'
+        'tenant_id',
+        'account_id',
+        'member_id',
+        'type',
+        'expense_kind',
+        'category_id',
+        'description',
+        'amount',
+        'date',
+        'tags',
+        'notes',
+        'transfer_group_id'
     ];
 
     protected $casts = [
@@ -40,4 +51,3 @@ class Transaction extends Model
         return $this->hasMany(TransactionSplit::class);
     }
 }
-

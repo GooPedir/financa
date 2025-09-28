@@ -13,7 +13,7 @@ class GoalController extends Controller
 {
     public function index()
     {
-        return response()->json(Goal::with('category','account')->get());
+        return response()->json(Goal::with('category','account')->with('contributions')->get());
     }
 
     public function store(Request $request)
@@ -36,7 +36,7 @@ class GoalController extends Controller
 
     public function show($id)
     {
-        return response()->json(Goal::with('category','account')->findOrFail($id));
+        return response()->json(Goal::with('category','account', 'contributions')->findOrFail($id));
     }
 
     public function update(Request $request, $id)
@@ -77,5 +77,26 @@ class GoalController extends Controller
             'percent' => $goal->target_amount > 0 ? round(($sum / (float)$goal->target_amount) * 100, 2) : 0,
         ]);
     }
-}
 
+    public function contribute(Request $request, Goal $goal)
+    {
+        $data = $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'contributed_at' => 'nullable|date',
+            'note' => 'nullable|string'
+        ]);
+
+        $contribution = $goal->contributions()->create([
+            'amount' => $data['amount'],
+            'contributed_at' => $data['contributed_at'] ?? Carbon::now()->toDateString(),
+            'note' => $data['note'] ?? null,
+        ]);
+
+        $goal->increment('current_amount', $data['amount']);
+
+        return response()->json([
+            'goal' => $goal->refresh(),
+            'contribution' => $contribution,
+        ]);
+    }
+}

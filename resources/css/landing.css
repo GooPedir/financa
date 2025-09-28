@@ -1,0 +1,23 @@
+﻿body {
+    scroll-behavior: smooth;
+}
+
+.landing-hero {
+    background: linear-gradient(140deg, rgba(56, 189, 248, 0.12), rgba(15, 23, 42, 0.04));
+}
+
+.landing-hero .card-title {
+    font-weight: 600;
+}
+
+#login-message {
+    min-height: 1.25rem;
+}
+
+#login-message.success {
+    color: #15803d;
+}
+
+#login-message.error {
+    color: #b91c1c;
+}
